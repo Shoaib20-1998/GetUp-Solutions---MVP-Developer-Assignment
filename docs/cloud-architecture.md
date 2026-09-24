@@ -20,7 +20,7 @@ A dedicated S3 bucket, private by default, accessed only via the backend using s
 
 ## Secrets management
 
-AWS Secrets Manager holds the JWT signing key and the database credentials. The ECS task definition references secrets by ARN; they are injected as environment variables at container start and never baked into the image or committed to the repo (consistent with Requirement 12.1 in this same project).
+AWS Secrets Manager holds the JWT signing key, the database credentials, and the AI provider API key (Gemini). The ECS task definition references secrets by ARN; they are injected as environment variables at container start and never baked into the image or committed to the repo (consistent with Requirement 12.1 in this same project).
 
 ## Networking and security basics
 

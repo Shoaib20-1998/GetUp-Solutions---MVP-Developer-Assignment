@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
 
     ai_api_key: str | None = None
-    ai_model: str = "gpt-4o-mini"
+    ai_model: str = "gemini-flash-lite-latest"
 
     attachment_dir: str = "/data/attachments"
     max_attachment_bytes: int = 5_242_880

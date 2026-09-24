@@ -7,6 +7,7 @@ from app.routers.auth import router as auth_router
 from app.routers.comments import router as comments_router
 from app.routers.dashboard import router as dashboard_router
 from app.routers.tickets import router as tickets_router
+from app.routers.users import router as users_router
 
 
 def create_app() -> FastAPI:
@@ -30,6 +31,7 @@ def create_app() -> FastAPI:
     app.include_router(comments_router)
     app.include_router(activity_router)
     app.include_router(dashboard_router)
+    app.include_router(users_router)
 
     @app.get("/api/health", tags=["meta"], summary="Liveness probe")
     def health() -> dict[str, str]:

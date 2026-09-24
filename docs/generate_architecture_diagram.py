@@ -78,7 +78,7 @@ box(100, 620, 320, 60, "RDS PostgreSQL", "Multi-AZ, automated backups")
 
 # Right column: supporting services
 box(560, 200, 220, 60, "S3", "Ticket attachments")
-box(560, 300, 220, 60, "Secrets Manager", "JWT key, DB credentials")
+box(560, 300, 220, 60, "Secrets Manager", "JWT, DB, AI API key")
 box(560, 400, 220, 60, "CloudWatch", "Logs, metrics, alarms")
 box(560, 500, 220, 60, "ECR", "Container image registry")
 

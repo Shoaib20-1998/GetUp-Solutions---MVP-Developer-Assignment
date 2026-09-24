@@ -10,7 +10,7 @@ A customer support ticketing portal with AI-assisted triage. Customers raise tic
 | Backend | FastAPI (Python) |
 | Database | PostgreSQL |
 | Auth | JWT, bcrypt-hashed passwords |
-| AI | Deterministic mocked provider (no paid API key required or used) |
+| AI | Google Gemini (free tier) with automatic fallback to a deterministic mock provider |
 | Local run | Docker Compose |
 
 ## Running it
@@ -41,8 +41,8 @@ All configuration comes from the environment; nothing is committed. See `.env.ex
 | `DATABASE_URL` | Postgres connection string |
 | `JWT_SECRET` | Signing key for JWTs (generate your own, do not reuse the placeholder) |
 | `JWT_EXPIRY_MINUTES` | Token lifetime |
-| `AI_API_KEY` | Left blank. No paid AI provider is wired up -- see [AI triage](#ai-triage) below |
-| `AI_MODEL` | Unused while `AI_API_KEY` is unset; kept for forward compatibility |
+| `AI_API_KEY` | Optional. A free Gemini key (see [AI triage](#ai-triage)); leave blank to use the mock provider only |
+| `AI_MODEL` | Gemini model name, e.g. `gemini-flash-lite-latest`. Unused while `AI_API_KEY` is unset |
 | `MAX_ATTACHMENT_BYTES` | Attachment size limit (default 5 MiB) |
 | `ALLOWED_ATTACHMENT_TYPES` | Comma-separated allowed content types |
 
@@ -62,7 +62,12 @@ Sample tickets span every status and priority, including a resolved ticket and o
 
 ## AI triage
 
-The brief asks for AI-assisted triage with a mocked fallback when no API key is configured. This project uses **only** the mocked path: a deterministic, keyword-based provider (`backend/app/ai/mock_provider.py`) that suggests a category, priority, one-line summary, and draft reply with no network call and no cost. `AI_API_KEY` is read but never used to call a real model -- this was a deliberate scope decision to avoid any paid API usage, and it fully satisfies the requirement that the app "SHALL use a deterministic mocked AI provider" and remain "fully demonstrable without a paid key."
+Two providers implement the same `AIProvider` interface (`backend/app/ai/base.py`):
+
+- **`GeminiAIProvider`** (`backend/app/ai/gemini_provider.py`) calls Google's Gemini API directly over HTTPS (no SDK) when `AI_API_KEY` is set. Gemini's free tier requires no billing, just a key from [Google AI Studio](https://ai.google.dev).
+- **`MockAIProvider`** (`backend/app/ai/mock_provider.py`) is deterministic and keyword-based, with no network call and no cost. It's used outright when `AI_API_KEY` is empty, and it's also the automatic second attempt whenever Gemini fails on a given ticket (network error, rate limit, timeout, or a malformed response) -- so a ticket almost always ends up with *some* suggestion, real or mock, and ticket creation is never blocked on the AI call either way.
+
+This satisfies the brief's requirement that the app "SHALL use a deterministic mocked AI provider" and remain "fully demonstrable without a paid key," while also supporting a real LLM when a free key is available.
 
 All AI output is advisory: it's stored separately from the ticket's real `category`/`priority` fields and only applied when an Agent or Admin explicitly confirms it via the ticket's AI suggestion panel.
 
@@ -95,24 +100,21 @@ npm run build
 
 ## Assumptions made
 
-- "AI-assisted triage" is satisfied by a deterministic mock provider; no real LLM call is made anywhere in this project (see [AI triage](#ai-triage)).
+- "AI-assisted triage" is satisfied by Gemini (free tier) with an automatic fallback to a deterministic mock provider, so the app works fully with or without a key (see [AI triage](#ai-triage)).
 - Unentitled access to a ticket (wrong role, not a participant) returns `404` rather than `403`, so a caller can't distinguish "doesn't exist" from "exists but isn't yours."
 - Logout is client-side token disposal only; there's no server-side revocation list, since token lifetimes are short enough for this MVP.
-- The admin's "assign ticket" UI takes an agent's user ID directly rather than a searchable picker, since no "list users" endpoint was in scope.
+- The admin's "assign ticket" UI uses a dropdown of agents (backed by a narrowly-scoped, Admin-only `GET /api/users?role=agent`), not a full user management screen.
 
 ## Known limitations
 
 - **Test scope is deliberately narrow.** Per the brief, automated tests cover only authentication, ticket creation, and role-based access. The status workflow, pagination, comments, activity log, AI confirmation, and dashboard maths are not covered by automated tests and were verified manually.
 - **No production hardening.** No rate limiting, no CSRF protection beyond what SPA + Bearer-token auth implies, no WAF, no dependency vulnerability scanning pipeline.
-- **No real AI provider.** By design -- see above.
-- **No searchable agent picker for assignment.** An admin needs the target agent's raw user ID.
+- **Gemini's free tier can be rate-limited or temporarily overloaded** (Google-side, not app-specific); when that happens the mock fallback kicks in automatically, so this is not user-facing but is worth knowing about if a demo shows mock suggestions unexpectedly.
 - **Accessibility was reviewed structurally** (labeled controls, focus states, no horizontal scroll, loading/error states) but not validated with assistive technology or a full audit.
 - **Cloud architecture is a design exercise only.** Nothing in `docs/cloud-architecture.md` is actually provisioned.
 
 ## What would be done next
 
-- Add a real LLM provider behind the existing `AIProvider` interface (a free-tier API would drop in without touching the orchestration layer).
-- Add a searchable user/agent picker to the assignment UI.
 - Broaden automated test coverage to the status workflow, dashboard aggregation, and the AI confirmation endpoint.
 - Add rate limiting on `/api/auth/login` and `/api/auth/register`.
 - Wire up the cloud architecture for real: Terraform or CDK for the AWS resources described in `docs/cloud-architecture.md`.

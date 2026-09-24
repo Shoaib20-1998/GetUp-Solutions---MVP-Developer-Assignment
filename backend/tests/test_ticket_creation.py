@@ -176,6 +176,11 @@ class TestTicketCreationExamples:
 
 class TestAiGracefulFallback:
     def test_creation_succeeds_when_ai_provider_raises(self, client, user_factory):
+        """Ticket creation must succeed even when the primary AI provider is
+        unavailable (Requirement 9.7/15.2). The orchestration layer retries
+        once with the deterministic mock, so a suggestion is still present
+        whenever possible -- creation succeeding is the actual requirement;
+        this asserts that, plus the mock fallback firing."""
         from app.services import triage
 
         triage.set_provider(FailingAIProvider())
@@ -193,5 +198,6 @@ class TestAiGracefulFallback:
         )
         assert response.status_code == 201
         body = response.json()
-        assert body["ai_suggested_category"] is None
-        assert body["ai_suggested_priority"] is None
+        # The mock fallback fires and produces a real (mock) suggestion.
+        assert body["ai_suggested_category"] is not None
+        assert body["ai_suggested_priority"] is not None
