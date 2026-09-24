@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ticketing
+      POSTGRES_PASSWORD: ticketing
+      POSTGRES_DB: ticketing
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ticketing"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://ticketing:ticketing@postgres:5432/ticketing}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      JWT_EXPIRY_MINUTES: ${JWT_EXPIRY_MINUTES:-60}
+      AI_API_KEY: ${AI_API_KEY:-}
+      AI_MODEL: ${AI_MODEL:-gpt-4o-mini}
+      ATTACHMENT_DIR: /data/attachments
+      MAX_ATTACHMENT_BYTES: ${MAX_ATTACHMENT_BYTES:-5242880}
+      ALLOWED_ATTACHMENT_TYPES: ${ALLOWED_ATTACHMENT_TYPES:-image/png,image/jpeg,application/pdf,text/plain}
+    ports:
+      - "8000:8000"
+    volumes:
+      - attachments:/data/attachments
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    environment:
+      VITE_API_TARGET: http://backend:8000
+    ports:
+      - "5173:5173"
+
+volumes:
+  pgdata:
+  attachments:

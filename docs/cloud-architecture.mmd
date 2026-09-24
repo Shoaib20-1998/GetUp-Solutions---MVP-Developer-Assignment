@@ -1,0 +1,45 @@
+graph TB
+    subgraph Users
+        Browser[Browser]
+    end
+
+    subgraph "AWS Account"
+        subgraph "Edge"
+            CF[CloudFront CDN]
+            S3Static[S3 Bucket<br/>React SPA static assets]
+        end
+
+        subgraph "Public Subnet"
+            ALB[Application Load Balancer<br/>HTTPS/TLS termination]
+        end
+
+        subgraph "Private Subnet - App Tier"
+            ECS[ECS Fargate Service<br/>FastAPI containers, auto-scaled]
+        end
+
+        subgraph "Private Subnet - Data Tier"
+            RDS[(RDS PostgreSQL<br/>Multi-AZ, automated backups)]
+        end
+
+        S3Attach[S3 Bucket<br/>Ticket attachments]
+        SM[Secrets Manager<br/>JWT signing key, DB credentials]
+        CW[CloudWatch<br/>Logs, metrics, alarms]
+        ECR[ECR<br/>Container image registry]
+    end
+
+    subgraph "CI/CD"
+        GH[GitHub Actions]
+    end
+
+    Browser -->|HTTPS| CF
+    CF --> S3Static
+    Browser -->|HTTPS /api| ALB
+    ALB --> ECS
+    ECS -->|TLS| RDS
+    ECS -->|read/write| S3Attach
+    ECS -->|fetch secrets at boot| SM
+    ECS -->|logs and metrics| CW
+
+    GH -->|build and push image| ECR
+    GH -->|deploy| ECS
+    GH -->|sync build| S3Static

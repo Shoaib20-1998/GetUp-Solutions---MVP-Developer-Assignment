@@ -1,0 +1,438 @@
+/* Design tokens */
+:root {
+  --color-bg: #f4f5f7;
+  --color-surface: #ffffff;
+  --color-border: #e2e5ea;
+  --color-text: #1a1d29;
+  --color-text-muted: #6b7280;
+  --color-primary: #4f46e5;
+  --color-primary-hover: #4338ca;
+  --color-primary-soft: #eef2ff;
+  --color-danger: #dc2626;
+  --color-danger-soft: #fef2f2;
+  --color-success: #16a34a;
+  --color-success-soft: #f0fdf4;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.08);
+
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background: var(--color-bg);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.25;
+  margin: 0 0 0.75rem;
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+p {
+  margin: 0 0 0.75rem;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.muted {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+/* Layout */
+main {
+  max-width: 980px;
+  margin: 1.5rem auto;
+  padding: 0 1rem 3rem;
+}
+
+/* Top nav */
+header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1.5rem;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+header nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+header nav a {
+  color: var(--color-text);
+  font-weight: 500;
+  padding: 0.35rem 0;
+  border-bottom: 2px solid transparent;
+}
+
+header nav a:hover {
+  color: var(--color-primary);
+  text-decoration: none;
+  border-bottom-color: var(--color-primary);
+}
+
+header > div {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+/* Cards: every page's top-level content and every <section> reads as a
+   panel, which is what makes the app look designed rather than like plain
+   HTML with margins. */
+main > form,
+main > table,
+section,
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+main > p:first-of-type {
+  margin-top: -0.25rem;
+}
+
+/* Forms */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  max-width: 32rem;
+}
+
+form label {
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-bottom: 0.3rem;
+  display: block;
+}
+
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 0.95rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  width: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: #c7cbd4;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+textarea {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+input[type="checkbox"] {
+  width: auto;
+  margin-right: 0.4rem;
+}
+
+form label:has(input[type="checkbox"]) {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+/* Buttons */
+button {
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  transition: background 0.15s, border-color 0.15s, transform 0.05s;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Default (primary) button style */
+button,
+button[type="submit"] {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+button:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--color-bg);
+}
+
+header button {
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+header button:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.control-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.meta-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Filter bar */
+form.filters {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  max-width: none;
+  gap: 1rem;
+}
+
+form.filters > div,
+form.filters label {
+  margin-bottom: 0;
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.65rem 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+  word-break: break-word;
+  font-size: 0.9rem;
+}
+
+th {
+  color: var(--color-text-muted);
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+tbody tr:hover {
+  background: var(--color-bg);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.badge-category {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.badge-status-open {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.badge-status-in_progress {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge-status-resolved {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.badge-status-closed {
+  background: #f1f5f9;
+  color: var(--color-text-muted);
+}
+
+.badge-priority-low {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.badge-priority-medium {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.badge-priority-high {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.badge-priority-urgent {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+/* Pagination */
+nav[aria-label="Pagination"] {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+/* Lists inside sections (comments, activity) */
+section > ul {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+section > ul li {
+  padding: 0.75rem;
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+}
+
+section > ul li p {
+  margin: 0 0 0.25rem;
+}
+
+section > ul li p:first-child {
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+/* Focus visibility for keyboard users */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+[role="alert"] {
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  margin: 0.25rem 0;
+}
+
+/* Login / register centering. These two pages render <main> directly under
+   #root (no AppLayout header wrapping them), so this selector only matches
+   them. */
+#root:has(> main) {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+
+#root:has(> main) main {
+  width: 100%;
+  max-width: 26rem;
+}
