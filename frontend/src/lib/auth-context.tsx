@@ -71,6 +71,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [token]);
 
   const applyToken = (next: string) => {
+    // Set the module-level token synchronously, not just via the effect
+    // below. React effects run after commit, so a component that fetches
+    // data as soon as `token` state updates (e.g. the ticket list, mounted
+    // right after login) could fire its request before the effect had a
+    // chance to call setAuthToken, sending that first request with no
+    // Authorization header and getting a spurious 401.
+    setAuthToken(next);
     localStorage.setItem(STORAGE_KEY, next);
     setToken(next);
   };
